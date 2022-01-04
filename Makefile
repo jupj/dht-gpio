@@ -1,16 +1,20 @@
 src = $(wildcard *.c)
 obj = $(src:.c=.o)
+bin = converter blink
 
 CC=gcc
 CFLAGS=-O4
 
-all: converter
+all: $(bin)
+
+blink: blink.o convert.o
+	$(CC) -o $@ $^ -lgpiod
 
 converter: converter.o convert.o
-	$(CC) -o $@ $^ $(LDFLAGS)
+	$(CC) -o $@ $^
 
 tester: test.o convert.o
-	$(CC) -o $@ $^ $(LDFLAGS)
+	$(CC) -o $@ $^
 
 .PHONY: test
 test: tester
@@ -19,4 +23,4 @@ test: tester
 
 .PHONY: clean
 clean:
-	rm -f $(obj) converter
+	rm -f $(obj) $(bin)
