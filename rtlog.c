@@ -83,7 +83,7 @@ int gpio_init(struct gpio_pin *pin, char *chipname, char *portname) {
 int run(struct gpio_pin *pin) {
     const int N = 100;
     const int DELAY_USEC = 15;
-    struct timespec res, start, curr, log[N];
+    struct timespec res, start, curr, log[N], log2[N];
 
     CHECK(clock_getres(CLOCK_MONOTONIC, &res));
     CHECK(clock_gettime(CLOCK_MONOTONIC, &start));
@@ -110,8 +110,14 @@ int run(struct gpio_pin *pin) {
             }
             cnt += val;
         }
+        CHECK(clock_gettime(CLOCK_MONOTONIC, &log2[i]));
     }
     CHECK(clock_gettime(CLOCK_MONOTONIC, &end));
+
+    for (int i=1; i<N; i++) {
+        printf("Log2[%d]: %ld.%.9ld\t%+ld us\n", i, log[i].tv_sec, log[i].tv_nsec, diff(&log2[i-1], &log2[i])/1000);
+    }
+
     printf("Average diff: %ld us\n", diff(&log[0], &end)/(1000*(N-1)));
 
     return cnt;
