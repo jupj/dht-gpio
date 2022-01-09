@@ -30,7 +30,9 @@ long diff(const struct timespec *t1, const struct timespec *t2) {
 void set_rt_sched() {
     // Set thread to real time priority
     struct sched_param sp;
-    sp.sched_priority = 1;
+    memset(&sp, 0, sizeof(sp));
+    // Use FIFO scheduler with highest priority for the lowest chance of the kernel context switching.
+    sp.sched_priority = sched_get_priority_max(SCHED_FIFO);
     if (sched_setscheduler(0, SCHED_FIFO, &sp)) {
         perror("Failed to set thread to real-time priority");
     }
